@@ -1,8 +1,8 @@
-import os
-from dotenv import load_dotenv
 import yfinance as yf
 from fredapi import Fred
 from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -29,25 +29,30 @@ def get_risk_free_rate(maturity_years):
         return 0.05  # set to 5% if data retrieval fails
 
 def fetch_stock_data(ticker):
-    stock = yf.Ticker(ticker)
-    info = stock.info
-    history = stock.history(period="1mo")
-    
-    if history.empty:
+    try:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        history = stock.history(period="1mo")
+        
+        if history.empty:
+            return {
+                'current_price': info.get('regularMarketPrice', 0),
+                'volatility': 0,
+                'dividend_yield': float(info.get('dividendYield', 0)),
+                'company_name': info.get('longName', ticker)
+            }
+        
         return {
-            'current_price': info.get('currentPrice', 0),
-            'volatility': 0,
+            'current_price': info.get('regularMarketPrice', history['Close'].iloc[-1] if not history.empty else 0),
+            'volatility': history['Close'].pct_change().std() * (252 ** 0.5) if not history.empty else 0,
             'dividend_yield': float(info.get('dividendYield', 0)),
             'company_name': info.get('longName', ticker)
         }
-    
-    return {
-        'current_price': info.get('currentPrice', history['Close'].iloc[-1] if not history.empty else 0),
-        'volatility': history['Close'].pct_change().std() * (252 ** 0.5) if not history.empty else 0,
-        'dividend_yield': float(info.get('dividendYield', 0)),
-        'company_name': info.get('longName', ticker)
-    }
-
-def get_option_chain(ticker):
-    stock = yf.Ticker(ticker)
-    return stock.option_chain()
+    except Exception as e:
+        print(f"Error fetching stock data: {str(e)}")
+        return {
+            'current_price': 0,
+            'volatility': 0,
+            'dividend_yield': 0,
+            'company_name': ticker
+        }
