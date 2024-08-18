@@ -6,7 +6,7 @@ def create_heatmap(S_range, sigma_range, option_prices, title):
         z=option_prices,
         x=S_range,
         y=sigma_range,
-        colorscale='RdYlGn',  # Red to Yellow to Green colorscale
+        colorscale='RdYlGn',
         hovertemplate='Price: $%{x:.2f}<br>Volatility: %{y:.2f}<br>Option Value: $%{z:.2f}<extra></extra>'
     ))
     fig.update_layout(
