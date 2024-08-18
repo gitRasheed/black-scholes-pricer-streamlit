@@ -64,6 +64,24 @@ st.sidebar.markdown("---")
 st.sidebar.subheader("Trade Information")
 purchase_price = st.sidebar.number_input("Purchase Price ($)", value=0.0, step=0.01)
 
+st.sidebar.markdown("---")
+
+st.sidebar.subheader("Heatmap Parameters")
+heatmap_price_range = st.sidebar.slider(
+    "Stock Price Range (%)", 
+    min_value=10, 
+    max_value=300, 
+    value=(80, 120), 
+    step=5
+)
+heatmap_volatility_range = st.sidebar.slider(
+    "Volatility Range (%)", 
+    min_value=10, 
+    max_value=500, 
+    value=(50, 150), 
+    step=10
+)
+
 # Body
 st.title("📊 Black-Scholes Option Pricer")
 
@@ -121,8 +139,8 @@ with col2:
 st.markdown("---")
 
 st.subheader("Option Price Heatmap")
-S_range = np.linspace(0.8 * S, 1.2 * S, 50)
-sigma_range = np.linspace(0.5 * sigma, 1.5 * sigma, 50)
+S_range = np.linspace(S * heatmap_price_range[0]/100, S * heatmap_price_range[1]/100, 50)
+sigma_range = np.linspace(sigma * heatmap_volatility_range[0]/100, sigma * heatmap_volatility_range[1]/100, 50)
 call_prices = np.array([[BlackScholes(s, K, T, r, sig, q).calculate_option_price('call') for s in S_range] for sig in sigma_range])
 put_prices = np.array([[BlackScholes(s, K, T, r, sig, q).calculate_option_price('put') for s in S_range] for sig in sigma_range])
 col1, col2 = st.columns(2)
