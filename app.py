@@ -7,6 +7,7 @@ from visualizations import create_heatmap, create_greeks_plot, create_profit_los
 
 st.set_page_config(layout="wide", page_title="Options Pricer", page_icon="📊")
 
+# Sidebar
 st.sidebar.markdown("""
     <style>
     .linkedin-button {
@@ -40,25 +41,31 @@ st.sidebar.markdown("""
 
 st.sidebar.markdown("---")
 
-st.title("📊 Black-Scholes Option Pricer")
-
-st.sidebar.header("Input Parameters")
-
+st.sidebar.subheader("Stock Information")
 ticker = st.sidebar.text_input("Stock Ticker", value="AAPL")
 stock_data = fetch_stock_data(ticker)
-
-st.sidebar.write(f"Company: {stock_data['company_name']}")
+st.sidebar.markdown(f"**Company:** {stock_data['company_name']}")
 S = st.sidebar.number_input("Current Stock Price ($)", value=stock_data['current_price'], step=0.01)
+st.sidebar.markdown("<br>", unsafe_allow_html=True)  # Add extra space
+
+
+st.sidebar.subheader("Option &  Market Parameters")
 K = st.sidebar.number_input("Strike Price ($)", value=S, step=0.01)
 T = st.sidebar.number_input("Time to Maturity (years)", value=1.0, min_value=0.1, max_value=10.0, step=0.1)
 sigma = st.sidebar.number_input("Volatility (σ)", value=stock_data['volatility'], min_value=0.01, max_value=2.0, step=0.01)
 r = st.sidebar.number_input("Risk-free Rate (%)", value=get_risk_free_rate(T)*100, min_value=0.0, max_value=20.0, step=0.01, format="%.2f")
 q = st.sidebar.number_input("Dividend Yield (%)", value=float(stock_data['dividend_yield'])*100, min_value=0.0, max_value=20.0, step=0.01, format="%.2f")
 
-r /= 100  # Convert percentage to decimal
-q /= 100  # Convert percentage to decimal
+r /= 100
+q /= 100
 
+st.sidebar.markdown("---")
+
+st.sidebar.subheader("Trade Information")
 purchase_price = st.sidebar.number_input("Purchase Price ($)", value=0.0, step=0.01)
+
+# Body
+st.title("📊 Black-Scholes Option Pricer")
 
 bs_call = BlackScholes(S, K, T, r, sigma, q)
 bs_put = BlackScholes(S, K, T, r, sigma, q)
@@ -90,11 +97,11 @@ with col1:
     
     call_pnl = call_price - purchase_price
     if call_pnl > 0:
-        st.markdown(f"<p style='color:green;'>Profit: ${call_pnl:.2f}</p>", unsafe_allow_html=True)
+        st.success(f"Profit: ${call_pnl:.2f}")
     elif call_pnl < 0:
-        st.markdown(f"<p style='color:red;'>Loss: ${call_pnl:.2f}</p>", unsafe_allow_html=True)
+        st.error(f"Loss: ${call_pnl:.2f}")
     else:
-        st.write("Break-even")
+        st.info("Break-even")
 
 with col2:
     st.subheader("Put Option")
@@ -105,11 +112,13 @@ with col2:
     
     put_pnl = put_price - purchase_price
     if put_pnl > 0:
-        st.markdown(f"<p style='color:green;'>Profit: ${put_pnl:.2f}</p>", unsafe_allow_html=True)
+        st.success(f"Profit: ${put_pnl:.2f}")
     elif put_pnl < 0:
-        st.markdown(f"<p style='color:red;'>Loss: ${put_pnl:.2f}</p>", unsafe_allow_html=True)
+        st.error(f"Loss: ${put_pnl:.2f}")
     else:
-        st.write("Break-even")
+        st.info("Break-even")
+
+st.markdown("---")
 
 st.subheader("Option Price Heatmap")
 S_range = np.linspace(0.8 * S, 1.2 * S, 50)
@@ -122,6 +131,8 @@ with col1:
 with col2:
     st.plotly_chart(create_heatmap(S_range, sigma_range, put_prices, "Put Option Price"))
 
+st.markdown("---")
+
 st.subheader("Profit/Loss Chart")
 S_range = np.linspace(0.5 * K, 1.5 * K, 100)
 call_pnl_range = [max(s - K, 0) - purchase_price for s in S_range]
@@ -133,6 +144,8 @@ with col1:
     st.plotly_chart(create_profit_loss_chart(S_range, call_pnl_range, call_break_even, "Call Option P&L"))
 with col2:
     st.plotly_chart(create_profit_loss_chart(S_range, put_pnl_range, put_break_even, "Put Option P&L"))
+
+st.markdown("---")
 
 st.subheader("Greeks")
 call_greeks_values = {greek: [BlackScholes(s, K, T, r, sigma, q).calculate_greeks()[greek] for s in S_range] for greek in ['delta_call', 'gamma', 'vega', 'theta_call', 'rho_call']}
