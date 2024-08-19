@@ -1,9 +1,10 @@
-import pytest
 import numpy as np
+import pytest
+
 from src.visualizations import (
+    create_greeks_plot,
     create_heatmap,
     create_profit_loss_chart,
-    create_greeks_plot,
 )
 
 
@@ -39,9 +40,7 @@ def greek_data():
 
 
 def test_create_heatmap(stock_range, volatility_range, random_2d_data):
-    fig = create_heatmap(
-        stock_range, volatility_range, random_2d_data, random_2d_data, "Test Heatmap"
-    )
+    fig = create_heatmap(stock_range, volatility_range, random_2d_data, random_2d_data, "Test Heatmap")
 
     assert fig.layout.title.text == "Test Heatmap"
     assert fig.layout.xaxis.title.text == "Stock Price"
@@ -54,9 +53,7 @@ def test_create_heatmap(stock_range, volatility_range, random_2d_data):
 
 def test_create_profit_loss_chart(stock_range, random_1d_data):
     break_even = 100
-    fig = create_profit_loss_chart(
-        stock_range, random_1d_data, break_even, "Test P&L Chart"
-    )
+    fig = create_profit_loss_chart(stock_range, random_1d_data, break_even, "Test P&L Chart")
 
     assert fig.layout.title.text == "Test P&L Chart"
     assert fig.layout.xaxis.title.text == "Stock Price"

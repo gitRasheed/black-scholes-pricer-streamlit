@@ -1,4 +1,5 @@
 import pytest
+
 from src.black_scholes import BlackScholes
 
 
@@ -30,9 +31,5 @@ def test_greeks(bs_instance):
 def test_profit_loss(bs_instance):
     call_pnl = bs_instance.calculate_profit_loss("call", 10, 110)
     put_pnl = bs_instance.calculate_profit_loss("put", 10, 90)
-    assert (
-        call_pnl == 0
-    ), "Call PnL should be 0 when stock price equals strike plus premium"
-    assert (
-        put_pnl == 0
-    ), "Put PnL should be 0 when stock price equals strike minus premium"
+    assert call_pnl == 0, "Call PnL should be 0 when stock price equals strike plus premium"
+    assert put_pnl == 0, "Put PnL should be 0 when stock price equals strike minus premium"

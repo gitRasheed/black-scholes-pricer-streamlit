@@ -1,6 +1,7 @@
-import pytest
-from src.data_fetcher import get_risk_free_rate, fetch_stock_data
 import pandas as pd
+import pytest
+
+from src.data_fetcher import fetch_stock_data, get_risk_free_rate
 
 
 def test_get_risk_free_rate():

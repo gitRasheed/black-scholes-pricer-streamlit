@@ -40,7 +40,8 @@ st.sidebar.markdown(
     }
     </style>
     <a href="https://www.linkedin.com/in/khoshnaw" target="_blank" class="linkedin-button">
-        <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" width="20" height="20" />
+        <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg"
+        width="20" height="20" />
         Created by Rasheed Khoshnaw
     </a>
 """,
@@ -53,16 +54,12 @@ st.sidebar.subheader("Stock Information")
 ticker = st.sidebar.text_input("Stock Ticker", value="AAPL")
 stock_data = fetch_stock_data(ticker)
 st.sidebar.markdown(f"**Company:** {stock_data['company_name']}")
-S = st.sidebar.number_input(
-    "Current Stock Price ($)", value=stock_data["current_price"], step=0.01
-)
+S = st.sidebar.number_input("Current Stock Price ($)", value=stock_data["current_price"], step=0.01)
 st.sidebar.markdown("<br>", unsafe_allow_html=True)
 
 st.sidebar.subheader("Option &  Market Parameters")
 K = st.sidebar.number_input("Strike Price ($)", value=S, step=0.01)
-T = st.sidebar.number_input(
-    "Time to Maturity (years)", value=1.0, min_value=0.1, max_value=10.0, step=0.1
-)
+T = st.sidebar.number_input("Time to Maturity (years)", value=1.0, min_value=0.1, max_value=10.0, step=0.1)
 sigma = st.sidebar.number_input(
     "Volatility (σ)",
     value=stock_data["volatility"],
@@ -93,19 +90,13 @@ q /= 100
 st.sidebar.markdown("---")
 
 st.sidebar.subheader("Trade Information")
-call_purchase_price = st.sidebar.number_input(
-    "Call Option Purchase Price ($)", value=0.0, step=0.01
-)
-put_purchase_price = st.sidebar.number_input(
-    "Put Option Purchase Price ($)", value=0.0, step=0.01
-)
+call_purchase_price = st.sidebar.number_input("Call Option Purchase Price ($)", value=0.0, step=0.01)
+put_purchase_price = st.sidebar.number_input("Put Option Purchase Price ($)", value=0.0, step=0.01)
 
 st.sidebar.markdown("---")
 
 st.sidebar.subheader("Heatmap Parameters")
-heatmap_price_range = st.sidebar.slider(
-    "Stock Price Range (%)", min_value=10, max_value=300, value=(80, 120), step=5
-)
+heatmap_price_range = st.sidebar.slider("Stock Price Range (%)", min_value=10, max_value=300, value=(80, 120), step=5)
 heatmap_volatility_range = st.sidebar.slider(
     "Volatility Range (%)", min_value=10, max_value=500, value=(50, 150), step=10
 )
@@ -138,9 +129,7 @@ def display_greeks(greeks, option_type):
         if g.endswith(option_type) or g == "gamma" or g == "vega"
     }
 
-    return pd.DataFrame(greek_data.items(), columns=["Greek", "Value"]).set_index(
-        "Greek"
-    )
+    return pd.DataFrame(greek_data.items(), columns=["Greek", "Value"]).set_index("Greek")
 
 
 def get_pricing_status(purchase_price, model_price, threshold=0.01):
@@ -192,9 +181,7 @@ with col2:
 st.markdown("---")
 
 st.subheader("Option Price and PnL Heatmap")
-S_range = np.linspace(
-    S * heatmap_price_range[0] / 100, S * heatmap_price_range[1] / 100, 50
-)
+S_range = np.linspace(S * heatmap_price_range[0] / 100, S * heatmap_price_range[1] / 100, 50)
 sigma_range = np.linspace(
     sigma * heatmap_volatility_range[0] / 100,
     sigma * heatmap_volatility_range[1] / 100,
@@ -202,22 +189,10 @@ sigma_range = np.linspace(
 )
 
 call_prices = np.array(
-    [
-        [
-            BlackScholes(s, K, T, r, sig, q).calculate_option_price("call")
-            for s in S_range
-        ]
-        for sig in sigma_range
-    ]
+    [[BlackScholes(s, K, T, r, sig, q).calculate_option_price("call") for s in S_range] for sig in sigma_range]
 )
 put_prices = np.array(
-    [
-        [
-            BlackScholes(s, K, T, r, sig, q).calculate_option_price("put")
-            for s in S_range
-        ]
-        for sig in sigma_range
-    ]
+    [[BlackScholes(s, K, T, r, sig, q).calculate_option_price("put") for s in S_range] for sig in sigma_range]
 )
 
 call_pnl = call_prices - call_purchase_price
@@ -225,13 +200,9 @@ put_pnl = put_prices - put_purchase_price
 
 col1, col2 = st.columns(2)
 with col1:
-    st.plotly_chart(
-        create_heatmap(S_range, sigma_range, call_pnl, call_prices, "Call Option PnL")
-    )
+    st.plotly_chart(create_heatmap(S_range, sigma_range, call_pnl, call_prices, "Call Option PnL"))
 with col2:
-    st.plotly_chart(
-        create_heatmap(S_range, sigma_range, put_pnl, put_prices, "Put Option PnL")
-    )
+    st.plotly_chart(create_heatmap(S_range, sigma_range, put_pnl, put_prices, "Put Option PnL"))
 
 st.markdown("---")
 
@@ -243,37 +214,23 @@ call_break_even = S_range[np.argmin(np.abs(call_pnl_range))]
 put_break_even = S_range[np.argmin(np.abs(put_pnl_range))]
 col1, col2 = st.columns(2)
 with col1:
-    st.plotly_chart(
-        create_profit_loss_chart(
-            S_range, call_pnl_range, call_break_even, "Call Option P&L"
-        )
-    )
+    st.plotly_chart(create_profit_loss_chart(S_range, call_pnl_range, call_break_even, "Call Option P&L"))
 with col2:
-    st.plotly_chart(
-        create_profit_loss_chart(
-            S_range, put_pnl_range, put_break_even, "Put Option P&L"
-        )
-    )
+    st.plotly_chart(create_profit_loss_chart(S_range, put_pnl_range, put_break_even, "Put Option P&L"))
 
 st.markdown("---")
 
 st.subheader("Greeks")
 call_greeks_values = {
-    greek: [
-        BlackScholes(s, K, T, r, sigma, q).calculate_greeks()[greek] for s in S_range
-    ]
+    greek: [BlackScholes(s, K, T, r, sigma, q).calculate_greeks()[greek] for s in S_range]
     for greek in ["delta_call", "gamma", "vega", "theta_call", "rho_call"]
 }
 put_greeks_values = {
-    greek: [
-        BlackScholes(s, K, T, r, sigma, q).calculate_greeks()[greek] for s in S_range
-    ]
+    greek: [BlackScholes(s, K, T, r, sigma, q).calculate_greeks()[greek] for s in S_range]
     for greek in ["delta_put", "gamma", "vega", "theta_put", "rho_put"]
 }
 col1, col2 = st.columns(2)
 with col1:
-    st.plotly_chart(
-        create_greeks_plot(S_range, call_greeks_values, "Call Option Greeks")
-    )
+    st.plotly_chart(create_greeks_plot(S_range, call_greeks_values, "Call Option Greeks"))
 with col2:
     st.plotly_chart(create_greeks_plot(S_range, put_greeks_values, "Put Option Greeks"))
