@@ -106,7 +106,7 @@ def display_greeks(greeks, option_type):
     
     return pd.DataFrame(greek_data.items(), columns=['Greek', 'Value']).set_index('Greek')
 
-def get_pricing_status(purchase_price, model_price, threshold=0.02):
+def get_pricing_status(purchase_price, model_price, threshold=0.01):
     if purchase_price == 0:
         return ""
     difference = (purchase_price - model_price) / model_price
