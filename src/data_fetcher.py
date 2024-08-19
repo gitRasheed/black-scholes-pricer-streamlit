@@ -1,37 +1,27 @@
-"""Module for fetching financial data from FRED and stock information."""
-
 from datetime import datetime, timedelta
 from os import getenv
 
+import fredapi as fred
 import streamlit as st
 import yfinance as yf
-from fredapi import Fred
 
-# Fred API key from envrionment or secrets
-try:
-    from dotenv import load_dotenv
 
-    load_dotenv()
-except ImportError:
-    pass
+def get_fred_api_key():
+    api_key = getenv("FRED_API_KEY")
 
-fred_api_key = st.secrets.get("FRED_API_KEY") or getenv("FRED_API_KEY")
+    if not api_key:
+        try:
+            api_key = st.secrets.get("FRED_API_KEY")
+        except (AttributeError, RuntimeError):
+            pass
 
-if not fred_api_key:
-    raise ValueError("FRED_API_KEY not found. Please set it in your environment, .env file, or Streamlit secrets.")
+    if not api_key:
+        raise ValueError("FRED_API_KEY not found in environment variables or Streamlit secrets.")
 
-fred = Fred(api_key=fred_api_key)
+    return api_key
 
 
 def get_risk_free_rate(maturity_years):
-    """Fetch the risk-free rate from FRED based on the given maturity.
-
-    Args:
-        maturity_years (float): The maturity period in years.
-
-    Returns:
-        float: The risk-free rate as a percentage (e.g., 0.05 for 5%).
-    """
     series_map = {
         1 / 12: "DTB4WK",
         2 / 12: "DTB4WK",
@@ -66,14 +56,6 @@ def get_risk_free_rate(maturity_years):
 
 
 def fetch_stock_data(ticker):
-    """Fetch stock data for a given ticker symbol.
-
-    Args:
-        ticker (str): The stock ticker symbol.
-
-    Returns:
-        dict: A dictionary containing current price, volatility, dividend yield, and company name.
-    """
     try:
         stock = yf.Ticker(ticker)
         info = stock.info

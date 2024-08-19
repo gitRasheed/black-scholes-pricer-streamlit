@@ -5,7 +5,7 @@ from src.black_scholes import BlackScholes
 
 @pytest.fixture
 def bs_instance():
-    return BlackScholes(S=100, K=100, T=1, r=0.05, sigma=0.2, q=0.01)
+    return BlackScholes(s=100, k=100, t=1, r=0.05, sigma=0.2, q=0.01)
 
 
 def test_call_option_price(bs_instance):

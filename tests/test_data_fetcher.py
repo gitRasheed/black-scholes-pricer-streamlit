@@ -1,7 +1,16 @@
 import pandas as pd
 import pytest
 
-from src.data_fetcher import fetch_stock_data, get_risk_free_rate
+from src.data_fetcher import fetch_stock_data, get_fred_api_key, get_risk_free_rate
+
+
+@pytest.fixture(autouse=True)
+def mock_fred_api_key(monkeypatch):
+    monkeypatch.setenv("FRED_API_KEY", "mock_api_key")
+
+
+def test_get_fred_api_key():
+    assert get_fred_api_key() == "mock_api_key"
 
 
 def test_get_risk_free_rate():
