@@ -1,8 +1,6 @@
- Black-Scholes Option Pricer
-
 ## Project Overview
 
-Black-Scholes option pricer in streamlit with customizable parameters, ability to use real market data, and visualizations for PnL & Greeks in reaction to different volatilities and prices
+Black-Scholes option pricer in streamlit with customizable parameters, ability to use real market data, and visualizations for PnL & Greeks in reaction to different volatilities and prices. Also used this as an opportunity to test a basic pipeline with GitHub Actions & implement Ruff linting & formatting within it.
 
 ## Features
 
