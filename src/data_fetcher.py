@@ -1,3 +1,4 @@
+from contextlib import suppress
 from datetime import datetime, timedelta
 from os import getenv
 
@@ -10,10 +11,8 @@ def get_fred_api_key():
     api_key = getenv("FRED_API_KEY")
 
     if not api_key:
-        try:
+        with suppress(AttributeError, RuntimeError):
             api_key = st.secrets.get("FRED_API_KEY")
-        except (AttributeError, RuntimeError):
-            pass
 
     if not api_key:
         raise ValueError("FRED_API_KEY not found in environment variables or Streamlit secrets.")
@@ -44,7 +43,7 @@ def get_risk_free_rate(maturity_years):
     start_date = end_date - timedelta(days=7)
 
     try:
-        data = fred.get_series(series_id, start_date, end_date)
+        data = fred.get_series(series_id, start_date, end_date)  # type: ignore
         if not data.empty:
             last_value = data.iloc[-1]
             return float(last_value) / 100
