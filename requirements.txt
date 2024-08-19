@@ -1,7 +1,8 @@
-streamlit
-numpy
-scipy
-plotly
-yfinance
 fredapi
+numpy
+plotly
+pytest
 python-dotenv
+scipy
+streamlit
+yfinance
