@@ -70,7 +70,7 @@ def create_profit_loss_chart(S_range, pnl, break_even, title):
                 line=dict(width=0),
                 showlegend=False,
                 name="Profit",
-                hoverinfo='skip'
+                hoverinfo="skip",
             ),
             go.Scatter(
                 x=S_range,
@@ -80,7 +80,7 @@ def create_profit_loss_chart(S_range, pnl, break_even, title):
                 line=dict(width=0),
                 showlegend=False,
                 name="Loss",
-                hoverinfo='skip'
+                hoverinfo="skip",
             ),
         ]
     )

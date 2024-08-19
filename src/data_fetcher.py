@@ -8,6 +8,7 @@ import streamlit as st
 # Fred API key from envrionment or secrets
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass
@@ -15,9 +16,12 @@ except ImportError:
 fred_api_key = getattr(st.secrets, "FRED_API_KEY", None) or getenv("FRED_API_KEY")
 
 if not fred_api_key:
-    raise ValueError("FRED_API_KEY not found. Please set it in your environment, .env file, or Streamlit secrets.")
+    raise ValueError(
+        "FRED_API_KEY not found. Please set it in your environment, .env file, or Streamlit secrets."
+    )
 
 fred = Fred(api_key=fred_api_key)
+
 
 def get_risk_free_rate(maturity_years):
     series_map = {
