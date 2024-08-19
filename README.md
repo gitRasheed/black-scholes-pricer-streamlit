@@ -55,3 +55,5 @@ Navigate to the provided local URL in your web browser to use the application.
 - Plotly
 - yfinance
 - FRED API
+- Github Actions
+- Ruff
