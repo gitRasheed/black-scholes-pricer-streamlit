@@ -46,8 +46,7 @@ ticker = st.sidebar.text_input("Stock Ticker", value="AAPL")
 stock_data = fetch_stock_data(ticker)
 st.sidebar.markdown(f"**Company:** {stock_data['company_name']}")
 S = st.sidebar.number_input("Current Stock Price ($)", value=stock_data['current_price'], step=0.01)
-st.sidebar.markdown("<br>", unsafe_allow_html=True)  # Add extra space
-
+st.sidebar.markdown("<br>", unsafe_allow_html=True)
 
 st.sidebar.subheader("Option &  Market Parameters")
 K = st.sidebar.number_input("Strike Price ($)", value=S, step=0.01)
@@ -62,7 +61,8 @@ q /= 100
 st.sidebar.markdown("---")
 
 st.sidebar.subheader("Trade Information")
-purchase_price = st.sidebar.number_input("Purchase Price ($)", value=0.0, step=0.01)
+call_purchase_price = st.sidebar.number_input("Call Option Purchase Price ($)", value=0.0, step=0.01)
+put_purchase_price = st.sidebar.number_input("Put Option Purchase Price ($)", value=0.0, step=0.01)
 
 st.sidebar.markdown("---")
 
@@ -106,6 +106,17 @@ def display_greeks(greeks, option_type):
     
     return pd.DataFrame(greek_data.items(), columns=['Greek', 'Value']).set_index('Greek')
 
+def get_pricing_status(purchase_price, model_price, threshold=0.02):
+    if purchase_price == 0:
+        return ""
+    difference = (purchase_price - model_price) / model_price
+    if abs(difference) <= threshold:
+        return "Fairly Priced"
+    elif difference > threshold:
+        return f"Overpriced ({difference:.2%})"
+    else:
+        return f"Underpriced ({-difference:.2%})"
+
 with col1:
     st.subheader("Call Option")
     st.metric("Price", f"${call_price:.2f}", delta=None)
@@ -113,13 +124,15 @@ with col1:
     st.write("Call Greeks")
     st.table(display_greeks(call_greeks, 'call'))
     
-    call_pnl = call_price - purchase_price
+    call_pnl = call_price - call_purchase_price
+    status = get_pricing_status(call_purchase_price, call_price)
+    
     if call_pnl > 0:
-        st.success(f"Profit: ${call_pnl:.2f}")
+        st.success(f"Profit: ${call_pnl:.2f}   —   {status}")
     elif call_pnl < 0:
-        st.error(f"Loss: ${call_pnl:.2f}")
+        st.error(f"Loss: ${call_pnl:.2f}   —   {status}")
     else:
-        st.info("Break-even")
+        st.info(f"Break-even   —   {status}")
 
 with col2:
     st.subheader("Put Option")
@@ -128,33 +141,40 @@ with col2:
     st.write("Put Greeks")
     st.table(display_greeks(put_greeks, 'put'))
     
-    put_pnl = put_price - purchase_price
+    put_pnl = put_price - put_purchase_price
+    status = get_pricing_status(put_purchase_price, put_price)
+    
     if put_pnl > 0:
-        st.success(f"Profit: ${put_pnl:.2f}")
+        st.success(f"Profit: ${put_pnl:.2f}   —   {status}")
     elif put_pnl < 0:
-        st.error(f"Loss: ${put_pnl:.2f}")
+        st.error(f"Loss: ${put_pnl:.2f}   —   {status}")
     else:
-        st.info("Break-even")
+        st.info(f"Break-even   —   {status}")
 
 st.markdown("---")
 
-st.subheader("Option Price Heatmap")
+st.subheader("Option Price and PnL Heatmap")
 S_range = np.linspace(S * heatmap_price_range[0]/100, S * heatmap_price_range[1]/100, 50)
 sigma_range = np.linspace(sigma * heatmap_volatility_range[0]/100, sigma * heatmap_volatility_range[1]/100, 50)
+
 call_prices = np.array([[BlackScholes(s, K, T, r, sig, q).calculate_option_price('call') for s in S_range] for sig in sigma_range])
 put_prices = np.array([[BlackScholes(s, K, T, r, sig, q).calculate_option_price('put') for s in S_range] for sig in sigma_range])
+
+call_pnl = call_prices - call_purchase_price
+put_pnl = put_prices - put_purchase_price
+
 col1, col2 = st.columns(2)
 with col1:
-    st.plotly_chart(create_heatmap(S_range, sigma_range, call_prices, "Call Option Price"))
+    st.plotly_chart(create_heatmap(S_range, sigma_range, call_pnl, call_prices, "Call Option PnL"))
 with col2:
-    st.plotly_chart(create_heatmap(S_range, sigma_range, put_prices, "Put Option Price"))
+    st.plotly_chart(create_heatmap(S_range, sigma_range, put_pnl, put_prices, "Put Option PnL"))
 
 st.markdown("---")
 
 st.subheader("Profit/Loss Chart")
 S_range = np.linspace(0.5 * K, 1.5 * K, 100)
-call_pnl_range = [max(s - K, 0) - purchase_price for s in S_range]
-put_pnl_range = [max(K - s, 0) - purchase_price for s in S_range]
+call_pnl_range = [max(s - K, 0) - call_purchase_price for s in S_range]
+put_pnl_range = [max(K - s, 0) - put_purchase_price for s in S_range]
 call_break_even = S_range[np.argmin(np.abs(call_pnl_range))]
 put_break_even = S_range[np.argmin(np.abs(put_pnl_range))]
 col1, col2 = st.columns(2)
