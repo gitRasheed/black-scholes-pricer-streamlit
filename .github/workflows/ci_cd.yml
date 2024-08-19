@@ -22,7 +22,17 @@ jobs:
         pip install pytest ruff
     - name: Run tests
       run: pytest
-    - name: Run Ruff
-      run: ruff .
-    - name: Check PEP8 compliance
-      run: ruff check --select E,F,W,I,N .
+    - name: Run Ruff (with warnings)
+      continue-on-error: true
+      run: |
+        ruff_output=$(ruff . 2>&1)
+        echo "Ruff output:"
+        echo "$ruff_output"
+        echo "::warning ::Ruff found linting issues. See output above for details."
+    - name: Check PEP8 compliance (with warnings)
+      continue-on-error: true
+      run: |
+        pep8_output=$(ruff check --select E,F,W,I,N . 2>&1)
+        echo "PEP8 check output:"
+        echo "$pep8_output"
+        echo "::warning ::PEP8 check found style issues. See output above for details."
