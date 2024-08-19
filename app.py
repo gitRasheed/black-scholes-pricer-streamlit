@@ -207,7 +207,7 @@ with col2:
 st.markdown("---")
 
 st.subheader("Profit/Loss Chart")
-S_range = np.linspace(0.5 * K, 1.5 * K, 100)
+S_range = np.linspace(0.5 * K, 1.5 * K, 100)  # type: ignore
 call_pnl_range = [max(s - K, 0) - call_purchase_price for s in S_range]
 put_pnl_range = [max(K - s, 0) - put_purchase_price for s in S_range]
 call_break_even = S_range[np.argmin(np.abs(call_pnl_range))]

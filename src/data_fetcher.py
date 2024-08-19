@@ -2,9 +2,9 @@ from contextlib import suppress
 from datetime import datetime, timedelta
 from os import getenv
 
-import fredapi as fred
 import streamlit as st
 import yfinance as yf
+from fredapi import Fred
 
 
 def get_fred_api_key():
@@ -18,6 +18,9 @@ def get_fred_api_key():
         raise ValueError("FRED_API_KEY not found in environment variables or Streamlit secrets.")
 
     return api_key
+
+
+fred = Fred(api_key=get_fred_api_key())
 
 
 def get_risk_free_rate(maturity_years):
@@ -43,7 +46,7 @@ def get_risk_free_rate(maturity_years):
     start_date = end_date - timedelta(days=7)
 
     try:
-        data = fred.get_series(series_id, start_date, end_date)  # type: ignore
+        data = fred.get_series(series_id, start_date, end_date)
         if not data.empty:
             last_value = data.iloc[-1]
             return float(last_value) / 100
