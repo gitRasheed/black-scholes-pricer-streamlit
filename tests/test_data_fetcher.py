@@ -1,5 +1,5 @@
 import pytest
-from data_fetcher import get_risk_free_rate, fetch_stock_data
+from src.data_fetcher import get_risk_free_rate, fetch_stock_data
 import pandas as pd
 
 def test_get_risk_free_rate():

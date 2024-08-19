@@ -1,5 +1,5 @@
 import pytest
-from black_scholes import BlackScholes
+from src.black_scholes import BlackScholes
 
 @pytest.fixture
 def bs_instance():
