@@ -10,15 +10,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.11.8'
 
     - name: Cache Python dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -37,18 +37,17 @@ jobs:
       run: |
         pytest
 
-    - name: Run Ruff (with warnings)
-      continue-on-error: true
+    - name: Run Ruff
       run: |
-        ruff_output=$(ruff . 2>&1)
-        echo "Ruff output:"
-        echo "$ruff_output"
-        echo "::warning ::Ruff found linting issues. See output above for details."
+        ruff check .
+      continue-on-error: true
 
-    - name: Check PEP8 compliance (with warnings)
-      continue-on-error: true
+    - name: Run Ruff format
       run: |
-        pep8_output=$(ruff check --select E,F,W,I,N . 2>&1)
-        echo "PEP8 check output:"
-        echo "$pep8_output"
-        echo "::warning ::PEP8 check found style issues. See output above for details."
+        ruff format --check .
+      continue-on-error: true
+
+    - name: Check PEP8 compliance
+      run: |
+        ruff check --select E,F,W,I,N .
+      continue-on-error: true
