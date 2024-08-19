@@ -57,3 +57,6 @@ Navigate to the provided local URL in your web browser to use the application.
 - FRED API
 - Github Actions
 - Ruff
+
+## TODO
+- Could experiment with implementing option strategies like spreads, straddles, etc and their payoffs
