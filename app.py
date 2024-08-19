@@ -10,7 +10,7 @@ from src.visualizations import (
     create_profit_loss_chart,
 )
 
-st.set_page_config(layout="wide", page_title="Options Pricer", page_icon="📊")
+st.set_page_config(layout="wide", page_title="Options Pricer", page_icon="📈")
 
 # Sidebar
 st.sidebar.markdown(
