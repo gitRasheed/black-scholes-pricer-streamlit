@@ -1,13 +1,15 @@
 import plotly.graph_objects as go
 import numpy as np
 
-def create_heatmap(S_range, sigma_range, option_prices, title):
+def create_heatmap(S_range, sigma_range, pnl, option_prices, title):
     fig = go.Figure(data=go.Heatmap(
-        z=option_prices,
+        z=pnl,
         x=S_range,
         y=sigma_range,
         colorscale='RdYlGn',
-        hovertemplate='Price: $%{x:.2f}<br>Volatility: %{y:.2f}<br>Option Value: $%{z:.2f}<extra></extra>'
+        zmid=0,
+        hovertemplate='Price: $%{x:.2f}<br>Volatility: %{y:.2f}<br>PnL: $%{z:.2f}<br>Option Value: $%{customdata:.2f}<extra></extra>',
+        customdata=option_prices
     ))
     fig.update_layout(
         title=title,
